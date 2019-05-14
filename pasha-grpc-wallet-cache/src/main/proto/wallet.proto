@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option java_package = "pasha.grpc.wallet.cache";
+
+enum Currency{
+    USD=0;
+    EUR=1;
+    GBP=2;
+}
+
+message Result{
+    int32 code=1;
+    string message=2;
+}
+
+message DepositRequest {
+    int32 user_id = 1;
+    float amount = 2;
+    Currency currency=3;
+
+}
+
+message DepositResponse {
+    Result result=1;
+}
+
+message WithdrawRequest {
+    int32 user_id = 1;
+    float amount = 2;
+    Currency currency=3;
+}
+
+message WithdrawResponse {
+    Result result=1;
+}
+
+message BalanceRequest {
+    int32 user_id = 1;
+}
+
+
+message Funds{
+    Currency currency=1;
+    float amount=2;
+}
+message BalanceResponse {
+    repeated Funds funds =1;
+}
+service WalletService {
+    rpc Deposit ( DepositRequest) returns ( stream DepositResponse) {}
+    rpc Withdraw ( WithdrawRequest) returns ( stream WithdrawResponse) {}
+    rpc Balance( BalanceRequest)  returns ( stream BalanceResponse) {}
+}
+
+

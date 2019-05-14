@@ -1,0 +1,49 @@
+= Simple gRPC Wallet
+
+== References :
+
+https://github.com/LogNet/grpc-spring-boot-starter
+
+https://grpc.io/
+
+https://vladmihalcea.com/a-beginners-guide-to-database-locking-and-the-lost-update-phenomena/
+
+== Versions :
+pasha-grpc-wallet-cache:
+Customized manual cache saving latest balances database fetches.
+pasha-grpc-wallet-practical :
+Used hibernate annotations preventing 'LOST UPDATES'.
+
+
+== Features
+
+Protocol Buffer version : *proto3*
+
+Spring boot version : *2.x.x*.
+
+== Setup
+
+Database initialization : set hibernate.hbm2ddl.auto=update
+For elder MySql versions uncomment #database.driverClassName=com.mysql.jdbc.Driver
+
+== Run
+
+For client simulation set variables and run test unit in WalletClientTest class :
+
+[source,java]
+
+    walletClient.setNumberOfCuncurrentUsers(15); //Users number
+    walletClient.setConcurrentThreadsPerUser(5);  //Threads per user
+    walletClient.setRoundsPerThread(4);  //Rounds per thread
+    @Test
+    public void testClient() throws InterruptedException {
+        walletClient.run();
+    }
+
+
+For server run test unit in ServerApiTest class :
+
+[source,java]
+@Test
+    public void serverTest() {...}
+

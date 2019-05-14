@@ -1,0 +1,5 @@
+//rootProject.name = 'org.lognet'
+include 'grpc-spring-boot-starter'
+include 'pasha-grpc-wallet-cache'
+include 'pasha-grpc-wallet-practical'
+
