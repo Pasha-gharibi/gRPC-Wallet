@@ -10,9 +10,11 @@ https://vladmihalcea.com/a-beginners-guide-to-database-locking-and-the-lost-upda
 
 == Versions :
 pasha-grpc-wallet-cache:
-Customized manual cache saving latest balances database fetches.
+
+manual cache saving latest balances database fetches.
 
 pasha-grpc-wallet-practical :
+
 Used hibernate annotations preventing 'LOST UPDATES'.
 
 
@@ -25,10 +27,12 @@ Spring boot version : *2.x.x*.
 == Setup
 
 Database initialization :
-set hibernate.hbm2ddl.auto=update
+
+set__ hibernate.hbm2ddl.auto=update__
 
 For elder MySql versions uncomment :
-#database.driverClassName=com.mysql.jdbc.Driver
+
+_#database.driverClassName=com.mysql.jdbc.Driver_
 
 == Run
 
