@@ -55,3 +55,21 @@ For server run test unit in ServerApiTest class :
 @Test
     public void serverTest() {...}
 
+
+== Performance 
+
+*Run both projects with same circumstances and same parameters :
+
+
+pasha-grpc-wallet-cache :
+after running application run this query on database : 
+[source,sql]
+select count(*)  , TIMESTAMPDIFF(SECOND ,min(TRANSACTION_TIME ),max(TRANSACTION_TIME)) as seconds from fund;
+
+
+pasha-grpc-wallet-practical :
+after running application run this query on database : 
+[source,sql]
+select count(*) ,  TIMESTAMPDIFF(SECOND,min(date),max(date)) as seconds from t_transaction;
+
+
