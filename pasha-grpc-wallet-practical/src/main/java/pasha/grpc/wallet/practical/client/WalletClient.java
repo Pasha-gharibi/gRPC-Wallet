@@ -68,7 +68,11 @@ import java.util.concurrent.TimeUnit;
         return list.get(rand.nextInt(list.size()));
     }
 
-
+    /**
+     *  In WalletClient class, the current implementation runs each user's transactions serially as awaitTermination method blocks
+     *  the current thread until the executor service have finished all its tasks so to run transactions concurrently I need to
+     *  invoke awaitTermination method when all executors services have had a chance to start executing their tasks
+     */
     public void run() throws InterruptedException {
 
         List<ExecutorService> executorServices = new ArrayList<>(); // number of concurrent users
@@ -88,9 +92,15 @@ import java.util.concurrent.TimeUnit;
                 ex.execute(roundBunch);
             }
             ex.shutdown();
-            ex.awaitTermination(50, TimeUnit.SECONDS);
-
         }
+
+        executorServices.forEach(ex-> {
+            try {
+                ex.awaitTermination(50, TimeUnit.SECONDS);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+        });
 
     }
 

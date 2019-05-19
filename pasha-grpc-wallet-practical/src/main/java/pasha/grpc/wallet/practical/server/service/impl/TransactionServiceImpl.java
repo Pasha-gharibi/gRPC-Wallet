@@ -26,23 +26,17 @@ public class TransactionServiceImpl implements TransactionService {
     TransactionRepository transactionRepository;
 
     /**
-     * By default Account has not declared in database. it will be inserted if it would not exist.
+     * By default Account has declared in database.
      * To provide ACID transaction I have forced to follow 'https://vladmihalcea.com/a-beginners-guide-to-acid-and-database-transactions/' to
      * prevent concurrency LOST_UPDATE problem throw multiple thread.
      */
     @Override
     @Transactional
     public Wallet.DepositResponse deposit(Wallet.DepositRequest request) {
-
         User user = new User();
         user.setId(request.getUserId());
-        Account account = accountRepository.getAccountByUserIdAndCurrency(request.getUserId(), Currency.valueOf(request.getCurrency().getNumber()).get());
-        if (account == null) {
-            account = new Account();
-            account.setCurrency(Currency.valueOf(request.getCurrencyValue()).get());
-            account.setUser(user);
-            account.setBalance(BigDecimal.ZERO);
-        }
+        Account account = accountRepository
+                .getAccountByUserIdAndCurrency(request.getUserId(), Currency.valueOf(request.getCurrency().getNumber()).get());
         account.setBalance(account.getBalance().add(BigDecimal.valueOf(request.getAmount())));
         accountRepository.save(account);
         Transaction transaction = new Transaction();
@@ -50,6 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setUser(user);
         transaction.setDate(new Date());
         transaction.setAmount(BigDecimal.valueOf(request.getAmount()));
+        transaction.setCurrency(Currency.valueOf(request.getCurrencyValue()).get());
         transactionRepository.save(transaction);
         return Wallet.DepositResponse.newBuilder().setResult(Wallet.Result.newBuilder()
                 .setCode(0).setMessage(Dashboard.ok).build()).build();
@@ -60,31 +55,25 @@ public class TransactionServiceImpl implements TransactionService {
     public Wallet.WithdrawResponse withdraw(Wallet.WithdrawRequest request) {
         User user = new User();
         user.setId(request.getUserId());
-        Account account = accountRepository.getAccountByUserIdAndCurrency(request.getUserId(), Currency.valueOf(request.getCurrency().getNumber()).get());
-        if (account == null) {
-            account = new Account();
-            account.setCurrency(Currency.valueOf(request.getCurrencyValue()).get());
-            account.setUser(user);
-            account.setBalance(BigDecimal.ZERO);
-            accountRepository.save(account);
-        }
+        Account account = accountRepository
+                .getAccountByUserIdAndCurrency(request.getUserId(), Currency.valueOf(request.getCurrency().getNumber()).get());
 
-        if (account.getBalance().compareTo(BigDecimal.valueOf(request.getAmount())) < 0) {
+        if (account == null || account.getBalance().compareTo(BigDecimal.valueOf(request.getAmount())) < 0) {
             return Wallet.WithdrawResponse.newBuilder().setResult(Wallet.Result.newBuilder()
                     .setCode(1).setMessage(Dashboard.insufficient_funds).build()).build();
         } else {
-
+            account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(request.getAmount())));
+            accountRepository.save(account);
             Transaction transaction = new Transaction();
             transaction.setUser(user);
-            account.setBalance(account.getBalance().subtract(BigDecimal.valueOf(request.getAmount())));
             transaction.setAccount(account);
             transaction.setDate(new Date());
             transaction.setAmount(BigDecimal.ZERO.subtract(BigDecimal.valueOf(request.getAmount())));
+            transaction.setCurrency(Currency.valueOf(request.getCurrencyValue()).get());
             transactionRepository.save(transaction);
             return Wallet.WithdrawResponse.newBuilder().setResult(Wallet.Result.newBuilder()
                     .setCode(0).setMessage(Dashboard.ok).build()).build();
         }
-
     }
 
 

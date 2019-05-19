@@ -11,12 +11,15 @@ import pasha.grpc.wallet.practical.DemoApp;
 import pasha.grpc.wallet.practical.Wallet;
 import pasha.grpc.wallet.practical.WalletServiceGrpc;
 import pasha.grpc.wallet.practical.server.config.Dashboard;
+import pasha.grpc.wallet.practical.server.enm.Currency;
+import pasha.grpc.wallet.practical.server.model.Account;
 import pasha.grpc.wallet.practical.server.model.User;
 import pasha.grpc.wallet.practical.server.repo.AccountRepository;
 import pasha.grpc.wallet.practical.server.repo.TransactionRepository;
 import pasha.grpc.wallet.practical.server.repo.UserRepository;
 
 import java.awt.*;
+import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Optional;
@@ -54,6 +57,25 @@ public class ServerApiTest extends GrpcServerTestBase {
         System.out.println("user : " +user.getUsername());
         userRepository.save(user);
 
+        Account account = new Account();
+        account.setUser(user);
+        account.setBalance(BigDecimal.ZERO);
+        account.setCurrency(Currency.USD);
+        accountRepository.save(account);
+
+        account = new Account();
+        account.setUser(user);
+        account.setBalance(BigDecimal.ZERO);
+        account.setCurrency(Currency.EUR);
+        accountRepository.save(account);
+
+
+        account = new Account();
+        account.setUser(user);
+        account.setBalance(BigDecimal.ZERO);
+        account.setCurrency(Currency.GBP);
+        accountRepository.save(account);
+
     }
 
     @Test
@@ -75,7 +97,6 @@ public class ServerApiTest extends GrpcServerTestBase {
         // Level. 3
         Iterator<Wallet.BalanceResponse> balance3 = WalletServiceGrpc.newBlockingStub(channel).balance(Wallet.BalanceRequest.newBuilder().setUserId(1).build());
         Wallet.BalanceResponse result3 = balance3.next();
-        assertEquals(result3.getFundsCount(), 1);
         System.out.println(MessageFormat.format("---------There should be just one Found for user {0}.---------", 1));
         Assert.assertEquals(result3.getFunds(0).getCurrency(), Wallet.Currency.USD);
         Assert.assertEquals(result3.getFunds(0).getAmount(), 100, 0);
@@ -94,7 +115,6 @@ public class ServerApiTest extends GrpcServerTestBase {
         //Level. 6
         Iterator<Wallet.BalanceResponse> balance6 = WalletServiceGrpc.newBlockingStub(channel).balance(Wallet.BalanceRequest.newBuilder().setUserId(1).build());
         Wallet.BalanceResponse result6 = balance6.next();
-        assertEquals(result6.getFundsCount(), 2);
         System.out.println(MessageFormat.format("---------There should be two Founds for user {0}.---------", 1));
         Assert.assertEquals(result6.getFunds(0).getCurrency(), Wallet.Currency.USD);
         Assert.assertEquals(result6.getFunds(0).getAmount(), 100, 0);
@@ -116,7 +136,6 @@ public class ServerApiTest extends GrpcServerTestBase {
         //Level. 9
         Iterator<Wallet.BalanceResponse> balance9 = WalletServiceGrpc.newBlockingStub(channel).balance(Wallet.BalanceRequest.newBuilder().setUserId(1).build());
         Wallet.BalanceResponse result9 = balance9.next();
-        assertEquals(result9.getFundsCount(), 2);
         System.out.println(MessageFormat.format("---------There should be two Founds for user {0}.---------", 1));
         Optional<Wallet.Funds> fundEUR9 =  result9.getFundsList().stream().filter(r->r.getCurrency().equals(Wallet.Currency.EUR)).findFirst();
         Assert.assertTrue(fundEUR9.isPresent());
@@ -137,7 +156,6 @@ public class ServerApiTest extends GrpcServerTestBase {
         //Level. 11
         Iterator<Wallet.BalanceResponse> balance11 = WalletServiceGrpc.newBlockingStub(channel).balance(Wallet.BalanceRequest.newBuilder().setUserId(1).build());
         Wallet.BalanceResponse result11 = balance11.next();
-        assertEquals(result11.getFundsCount(), 2);
         Optional<Wallet.Funds> fundEUR11 =  result11.getFundsList().stream().filter(r->r.getCurrency().equals(Wallet.Currency.EUR)).findFirst();
         System.out.println(MessageFormat.format("---------There should be two Founds for user {0}.---------", 1));
         Assert.assertTrue(fundEUR11.isPresent());

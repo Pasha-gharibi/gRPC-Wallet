@@ -3,6 +3,7 @@ package pasha.grpc.wallet.practical.server.model;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
+import pasha.grpc.wallet.practical.server.enm.Currency;
 
 
 @Entity(name = "T_TRANSACTION")
@@ -11,10 +12,10 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private BigDecimal amount ;
 
-    @Column
+    @Column(columnDefinition = "TIMESTAMP(6) not null")
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date date;
 
@@ -23,8 +24,13 @@ public class Transaction {
     private User user;
 
     @ManyToOne(targetEntity = Account.class,fetch = FetchType.EAGER)
-    @JoinColumn(name = "FK_ACCOUNT")
+    @JoinColumn(name = "FK_ACCOUNT", nullable = false)
     private Account account;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Currency currency;
+
 
     public Long getId() {
         return id;
@@ -64,6 +70,14 @@ public class Transaction {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 }
 
